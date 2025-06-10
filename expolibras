@@ -1,0 +1,1210 @@
+Aqui está o código HTML completo da planilha de organização empreendedora:
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planilha de Organização Empreendedora</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+        }
+        
+        .excel-header {
+            background-color: #217346;
+            color: white;
+        }
+        
+        .excel-cell {
+            border: 1px solid #e2e8f0;
+            padding: 4px 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            height: 28px;
+            min-width: 80px;
+        }
+        
+        .excel-header-cell {
+            background-color: #e6e6e6;
+            font-weight: 500;
+            text-align: center;
+            border: 1px solid #d1d5db;
+        }
+        
+        .excel-row:hover {
+            background-color: #f8fafc;
+        }
+        
+        .excel-row-selected {
+            background-color: #e8f0fe;
+        }
+        
+        .excel-sheet-tab {
+            border: 1px solid #d1d5db;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            padding: 6px 16px;
+            background-color: #f3f4f6;
+            cursor: pointer;
+        }
+        
+        .excel-sheet-tab.active {
+            background-color: #217346;
+            color: white;
+            font-weight: 500;
+        }
+        
+        .excel-toolbar {
+            background-color: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .excel-toolbar-button {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .excel-toolbar-button:hover {
+            background-color: #e5e7eb;
+        }
+        
+        .excel-formula-bar {
+            border: 1px solid #d1d5db;
+            padding: 4px 8px;
+            background-color: white;
+        }
+        
+        .status-pendente {
+            background-color: #FEF3C7;
+        }
+        
+        .status-concluido {
+            background-color: #D1FAE5;
+        }
+        
+        .status-em-andamento {
+            background-color: #DBEAFE;
+        }
+        
+        .status-atrasado {
+            background-color: #FEE2E2;
+        }
+        
+        .payment-received {
+            color: #047857;
+            font-weight: 500;
+        }
+        
+        .payment-pending {
+            color: #B45309;
+            font-weight: 500;
+        }
+        
+        .excel-container {
+            overflow: auto;
+            max-height: calc(100vh - 200px);
+        }
+        
+        .excel-row-header {
+            background-color: #e6e6e6;
+            font-weight: 500;
+            text-align: center;
+            width: 40px;
+            min-width: 40px;
+            border: 1px solid #d1d5db;
+        }
+        
+        .excel-col-header {
+            background-color: #e6e6e6;
+            font-weight: 500;
+            text-align: center;
+            height: 28px;
+            border: 1px solid #d1d5db;
+        }
+        
+        .calendar-day {
+            border: 1px solid #d1d5db;
+            min-height: 80px;
+            background-color: white;
+        }
+        
+        .calendar-day-header {
+            background-color: #f3f4f6;
+            text-align: right;
+            padding: 2px 4px;
+            font-weight: 500;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .calendar-event {
+            margin: 2px;
+            padding: 2px 4px;
+            border-radius: 2px;
+            font-size: 11px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .repasse-status-pago {
+            background-color: #D1FAE5;
+            color: #065F46;
+        }
+        
+        .repasse-status-pendente {
+            background-color: #FEF3C7;
+            color: #92400E;
+        }
+        
+        .repasse-status-nao-necessario {
+            background-color: #E5E7EB;
+            color: #4B5563;
+        }
+        
+        .nf-status-emitida {
+            background-color: #D1FAE5;
+            color: #065F46;
+        }
+        
+        .nf-status-pendente {
+            background-color: #FEF3C7;
+            color: #92400E;
+        }
+        
+        .nf-status-nao-necessaria {
+            background-color: #E5E7EB;
+            color: #4B5563;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen">
+        <!-- Excel-like Header -->
+        <div class="excel-header p-2 flex justify-between items-center">
+            <div class="text-xl font-bold">Planilha de Organização Empreendedora</div>
+            <div class="flex space-x-2">
+                <button id="addProjectBtn" class="bg-white text-green-800 px-3 py-1 rounded hover:bg-gray-100">
+                    + Novo Projeto
+                </button>
+                <button id="addClientBtn" class="bg-white text-green-800 px-3 py-1 rounded hover:bg-gray-100">
+                    + Novo Cliente
+                </button>
+            </div>
+        </div>
+        
+        <!-- Excel-like Toolbar -->
+        <div class="excel-toolbar p-2 flex justify-between items-center">
+            <div class="flex space-x-4">
+                <div class="flex items-center">
+                    <span class="mr-2 text-sm font-medium">Mês:</span>
+                    <button id="prevMonth" class="excel-toolbar-button">◀</button>
+                    <span id="currentMonth" class="mx-2 font-medium"></span>
+                    <button id="nextMonth" class="excel-toolbar-button">▶</button>
+                </div>
+                
+                <div class="flex items-center">
+                    <span class="mr-2 text-sm font-medium">Buscar:</span>
+                    <input type="text" id="searchInput" placeholder="Projeto ou cliente..." 
+                        class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-green-500">
+                </div>
+            </div>
+            
+            <div class="flex space-x-4">
+                <div class="flex items-center">
+                    <span class="text-sm font-medium mr-2">Projetos Ativos:</span>
+                    <span id="activeProjects" class="font-bold">0</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="text-sm font-medium mr-2">Recebido:</span>
+                    <span class="text-green-700">R$ <span id="monthlyRevenue" class="font-bold">0,00</span></span>
+                </div>
+                <div class="flex items-center">
+                    <span class="text-sm font-medium mr-2">A Receber:</span>
+                    <span class="text-amber-700">R$ <span id="pendingRevenue" class="font-bold">0,00</span></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Excel-like Sheet Tabs -->
+        <div class="flex bg-gray-100 border-t border-gray-300">
+            <div id="projectsTab" class="excel-sheet-tab active">Projetos</div>
+            <div id="financialTab" class="excel-sheet-tab">Financeiro</div>
+            <div id="calendarTab" class="excel-sheet-tab">Calendário</div>
+            <div id="clientsTab" class="excel-sheet-tab">Clientes</div>
+        </div>
+        
+        <!-- Excel-like Sheets Container -->
+        <div class="bg-white border-t border-gray-300">
+            <!-- Projects Sheet -->
+            <div id="projectsSheet" class="excel-container">
+                <table class="w-full table-fixed border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="excel-row-header">#</th>
+                            <th class="excel-col-header" style="min-width: 200px;">Projeto</th>
+                            <th class="excel-col-header" style="min-width: 180px;">Cliente</th>
+                            <th class="excel-col-header" style="min-width: 100px;">Início</th>
+                            <th class="excel-col-header" style="min-width: 100px;">Entrega</th>
+                            <th class="excel-col-header" style="min-width: 120px;">Valor</th>
+                            <th class="excel-col-header" style="min-width: 120px;">Status</th>
+                            <th class="excel-col-header" style="min-width: 150px;">Pagamento</th>
+                            <th class="excel-col-header" style="min-width: 120px;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="projectsTableBody">
+                        <!-- Dados serão inseridos via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Financial Sheet -->
+            <div id="financialSheet" class="excel-container hidden">
+                <table class="w-full table-fixed border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="excel-row-header">#</th>
+                            <th class="excel-col-header" style="min-width: 180px;">Projeto</th>
+                            <th class="excel-col-header" style="min-width: 150px;">Cliente</th>
+                            <th class="excel-col-header" style="min-width: 120px;">Valor Bruto</th>
+                            <th class="excel-col-header" style="min-width: 180px;">Repasse Para</th>
+                            <th class="excel-col-header" style="min-width: 120px;">Valor Repasse</th>
+                            <th class="excel-col-header" style="min-width: 120px;">Valor Líquido</th>
+                            <th class="excel-col-header" style="min-width: 120px;">Status Repasse</th>
+                            <th class="excel-col-header" style="min-width: 200px;">Data Pagamento Repasse</th>
+                            <th class="excel-col-header" style="min-width: 120px;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="financialTableBody">
+                        <!-- Dados serão inseridos via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Calendar Sheet -->
+            <div id="calendarSheet" class="excel-container hidden">
+                <div class="p-4">
+                    <div class="grid grid-cols-7 gap-1">
+                        <div class="excel-col-header">Dom</div>
+                        <div class="excel-col-header">Seg</div>
+                        <div class="excel-col-header">Ter</div>
+                        <div class="excel-col-header">Qua</div>
+                        <div class="excel-col-header">Qui</div>
+                        <div class="excel-col-header">Sex</div>
+                        <div class="excel-col-header">Sáb</div>
+                    </div>
+                    <div id="calendar" class="grid grid-cols-7 gap-1">
+                        <!-- Dias do calendário serão inseridos via JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Clients Sheet -->
+            <div id="clientsSheet" class="excel-container hidden">
+                <table class="w-full table-fixed border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="excel-row-header">#</th>
+                            <th class="excel-col-header" style="min-width: 200px;">Nome</th>
+                            <th class="excel-col-header" style="min-width: 150px;">Contato</th>
+                            <th class="excel-col-header" style="min-width: 200px;">Email</th>
+                            <th class="excel-col-header" style="min-width: 150px;">Telefone</th>
+                            <th class="excel-col-header" style="min-width: 120px;">Projetos</th>
+                            <th class="excel-col-header" style="min-width: 150px;">Total Faturado</th>
+                            <th class="excel-col-header" style="min-width: 120px;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clientsTableBody">
+                        <!-- Dados serão inseridos via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para adicionar/editar projeto -->
+    <div id="projectModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="modalTitle" class="text-xl font-semibold text-gray-800">Novo Projeto</h2>
+                <button id="closeProjectModal" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="projectForm">
+                <input type="hidden" id="projectId">
+                <div class="mb-4">
+                    <label for="projectName" class="block text-sm font-medium text-gray-700 mb-1">Nome do Projeto</label>
+                    <input type="text" id="projectName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="clientSelect" class="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
+                    <select id="clientSelect" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                        <!-- Opções serão inseridas via JavaScript -->
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">Data de Início</label>
+                        <input type="date" id="startDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    </div>
+                    <div>
+                        <label for="endDate" class="block text-sm font-medium text-gray-700 mb-1">Data de Entrega</label>
+                        <input type="date" id="endDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="projectValue" class="block text-sm font-medium text-gray-700 mb-1">Valor (R$)</label>
+                        <input type="number" id="projectValue" min="0" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    </div>
+                    <div>
+                        <label for="projectStatus" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                        <select id="projectStatus" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                            <option value="pendente">Pendente</option>
+                            <option value="em-andamento">Em Andamento</option>
+                            <option value="concluido">Concluído</option>
+                            <option value="atrasado">Atrasado</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="paymentStatus" class="block text-sm font-medium text-gray-700 mb-1">Status do Pagamento</label>
+                    <select id="paymentStatus" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                        <option value="pendente">Pendente</option>
+                        <option value="recebido">Recebido</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="paymentDate" class="block text-sm font-medium text-gray-700 mb-1">Data do Pagamento</label>
+                    <input type="date" id="paymentDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" id="cancelProjectBtn" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md transition">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para adicionar/editar cliente -->
+    <div id="clientModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="clientModalTitle" class="text-xl font-semibold text-gray-800">Novo Cliente</h2>
+                <button id="closeClientModal" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="clientForm">
+                <input type="hidden" id="clientId">
+                <div class="mb-4">
+                    <label for="clientName" class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente</label>
+                    <input type="text" id="clientName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="clientContact" class="block text-sm font-medium text-gray-700 mb-1">Contato</label>
+                    <input type="text" id="clientContact" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+                <div class="mb-4">
+                    <label for="clientEmail" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="clientEmail" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="clientPhone" class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+                    <input type="tel" id="clientPhone" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" id="cancelClientBtn" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md transition">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para editar informações financeiras -->
+    <div id="financialModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="financialModalTitle" class="text-xl font-semibold text-gray-800">Informações Financeiras</h2>
+                <button id="closeFinancialModal" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="financialForm">
+                <input type="hidden" id="financialProjectId">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Projeto</label>
+                    <div id="financialProjectName" class="px-3 py-2 border border-gray-200 rounded-md bg-gray-50"></div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Valor Bruto</label>
+                    <div id="financialProjectValue" class="px-3 py-2 border border-gray-200 rounded-md bg-gray-50"></div>
+                </div>
+                <div class="mb-4">
+                    <label for="repasseTo" class="block text-sm font-medium text-gray-700 mb-1">Repasse Para</label>
+                    <input type="text" id="repasseTo" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+                <div class="mb-4">
+                    <label for="repasseValue" class="block text-sm font-medium text-gray-700 mb-1">Valor do Repasse (R$)</label>
+                    <input type="number" id="repasseValue" min="0" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+                <div class="mb-4">
+                    <label for="repasseStatus" class="block text-sm font-medium text-gray-700 mb-1">Status do Repasse</label>
+                    <select id="repasseStatus" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="pendente">Pendente</option>
+                        <option value="pago">Pago</option>
+                        <option value="nao-necessario">Não Necessário</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="repasseDate" class="block text-sm font-medium text-gray-700 mb-1">Data de Pagamento do Repasse</label>
+                    <input type="date" id="repasseDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" id="cancelFinancialBtn" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md transition">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Dados de exemplo
+        let clients = [
+            { id: 1, name: 'Empresa ABC', contact: 'João Silva', email: 'contato@abc.com', phone: '(11) 98765-4321' },
+            { id: 2, name: 'Loja XYZ', contact: 'Maria Oliveira', email: 'atendimento@xyz.com', phone: '(11) 91234-5678' },
+            { id: 3, name: 'Consultoria 123', contact: 'Pedro Santos', email: 'info@consultoria123.com', phone: '(21) 99876-5432' }
+        ];
+
+        let projects = [
+            { 
+                id: 1, 
+                name: 'Redesign de Site', 
+                clientId: 1, 
+                startDate: '2023-06-05', 
+                endDate: '2023-06-15', 
+                value: 2500.00, 
+                status: 'concluido', 
+                paymentStatus: 'recebido',
+                paymentDate: '2023-06-20',
+                repasseTo: 'Desenvolvedor Freelancer',
+                repasseValue: 1000.00,
+                repasseStatus: 'pago',
+                repasseDate: '2023-06-25'
+            },
+            { 
+                id: 2, 
+                name: 'Campanha de Marketing', 
+                clientId: 2, 
+                startDate: '2023-06-10', 
+                endDate: '2023-06-30', 
+                value: 3800.00, 
+                status: 'em-andamento', 
+                paymentStatus: 'pendente',
+                paymentDate: null,
+                repasseTo: 'Designer Gráfico',
+                repasseValue: 1200.00,
+                repasseStatus: 'pendente',
+                repasseDate: '2023-07-10'
+            },
+            { 
+                id: 3, 
+                name: 'Consultoria de Branding', 
+                clientId: 3, 
+                startDate: '2023-06-15', 
+                endDate: '2023-07-10', 
+                value: 5000.00, 
+                status: 'pendente', 
+                paymentStatus: 'pendente',
+                paymentDate: null,
+                repasseTo: '',
+                repasseValue: 0,
+                repasseStatus: 'nao-necessario',
+                repasseDate: null
+            }
+        ];
+
+        // Variáveis de controle
+        let currentDate = new Date();
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+        let editingProjectId = null;
+        let editingClientId = null;
+        let activeTab = 'projects';
+
+        // Elementos DOM
+        const projectsTableBody = document.getElementById('projectsTableBody');
+        const financialTableBody = document.getElementById('financialTableBody');
+        const clientsTableBody = document.getElementById('clientsTableBody');
+        const calendar = document.getElementById('calendar');
+        const currentMonthElement = document.getElementById('currentMonth');
+        const prevMonthBtn = document.getElementById('prevMonth');
+        const nextMonthBtn = document.getElementById('nextMonth');
+        const addProjectBtn = document.getElementById('addProjectBtn');
+        const addClientBtn = document.getElementById('addClientBtn');
+        const projectModal = document.getElementById('projectModal');
+        const clientModal = document.getElementById('clientModal');
+        const financialModal = document.getElementById('financialModal');
+        const projectForm = document.getElementById('projectForm');
+        const clientForm = document.getElementById('clientForm');
+        const financialForm = document.getElementById('financialForm');
+        const cancelProjectBtn = document.getElementById('cancelProjectBtn');
+        const cancelClientBtn = document.getElementById('cancelClientBtn');
+        const cancelFinancialBtn = document.getElementById('cancelFinancialBtn');
+        const closeProjectModal = document.getElementById('closeProjectModal');
+        const closeClientModal = document.getElementById('closeClientModal');
+        const closeFinancialModal = document.getElementById('closeFinancialModal');
+        const clientSelect = document.getElementById('clientSelect');
+        const searchInput = document.getElementById('searchInput');
+        const activeProjectsElement = document.getElementById('activeProjects');
+        const monthlyRevenueElement = document.getElementById('monthlyRevenue');
+        const pendingRevenueElement = document.getElementById('pendingRevenue');
+        
+        // Tabs
+        const projectsTab = document.getElementById('projectsTab');
+        const financialTab = document.getElementById('financialTab');
+        const calendarTab = document.getElementById('calendarTab');
+        const clientsTab = document.getElementById('clientsTab');
+        const projectsSheet = document.getElementById('projectsSheet');
+        const financialSheet = document.getElementById('financialSheet');
+        const calendarSheet = document.getElementById('calendarSheet');
+        const clientsSheet = document.getElementById('clientsSheet');
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            updateMonthDisplay();
+            renderProjects();
+            renderFinancial();
+            renderClients();
+            renderCalendar();
+            updateClientSelect();
+            updateDashboardStats();
+
+            // Event listeners para navegação de mês
+            prevMonthBtn.addEventListener('click', () => {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                updateMonthDisplay();
+                renderCalendar();
+                updateDashboardStats();
+            });
+
+            nextMonthBtn.addEventListener('click', () => {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                updateMonthDisplay();
+                renderCalendar();
+                updateDashboardStats();
+            });
+
+            // Event listeners para abas
+            projectsTab.addEventListener('click', () => {
+                setActiveTab('projects');
+            });
+
+            financialTab.addEventListener('click', () => {
+                setActiveTab('financial');
+            });
+
+            calendarTab.addEventListener('click', () => {
+                setActiveTab('calendar');
+            });
+
+            clientsTab.addEventListener('click', () => {
+                setActiveTab('clients');
+            });
+
+            // Event listeners para modais
+            addProjectBtn.addEventListener('click', () => {
+                document.getElementById('modalTitle').textContent = 'Novo Projeto';
+                document.getElementById('projectId').value = '';
+                projectForm.reset();
+                projectModal.classList.remove('hidden');
+                editingProjectId = null;
+            });
+
+            addClientBtn.addEventListener('click', () => {
+                document.getElementById('clientModalTitle').textContent = 'Novo Cliente';
+                document.getElementById('clientId').value = '';
+                clientForm.reset();
+                clientModal.classList.remove('hidden');
+                editingClientId = null;
+            });
+
+            cancelProjectBtn.addEventListener('click', () => {
+                projectModal.classList.add('hidden');
+            });
+
+            cancelClientBtn.addEventListener('click', () => {
+                clientModal.classList.add('hidden');
+            });
+
+            cancelFinancialBtn.addEventListener('click', () => {
+                financialModal.classList.add('hidden');
+            });
+
+            closeProjectModal.addEventListener('click', () => {
+                projectModal.classList.add('hidden');
+            });
+
+            closeClientModal.addEventListener('click', () => {
+                clientModal.classList.add('hidden');
+            });
+
+            closeFinancialModal.addEventListener('click', () => {
+                financialModal.classList.add('hidden');
+            });
+
+            // Event listeners para formulários
+            projectForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                saveProject();
+            });
+
+            clientForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                saveClient();
+            });
+
+            financialForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                saveFinancial();
+            });
+
+            // Event listener para busca
+            searchInput.addEventListener('input', () => {
+                if (activeTab === 'projects') {
+                    renderProjects();
+                } else if (activeTab === 'financial') {
+                    renderFinancial();
+                } else if (activeTab === 'clients') {
+                    renderClients();
+                }
+            });
+        });
+
+        // Funções
+        function setActiveTab(tab) {
+            activeTab = tab;
+            
+            // Atualizar classes das abas
+            projectsTab.classList.remove('active');
+            financialTab.classList.remove('active');
+            calendarTab.classList.remove('active');
+            clientsTab.classList.remove('active');
+            
+            // Esconder todas as planilhas
+            projectsSheet.classList.add('hidden');
+            financialSheet.classList.add('hidden');
+            calendarSheet.classList.add('hidden');
+            clientsSheet.classList.add('hidden');
+            
+            // Mostrar a planilha ativa
+            if (tab === 'projects') {
+                projectsTab.classList.add('active');
+                projectsSheet.classList.remove('hidden');
+            } else if (tab === 'financial') {
+                financialTab.classList.add('active');
+                financialSheet.classList.remove('hidden');
+            } else if (tab === 'calendar') {
+                calendarTab.classList.add('active');
+                calendarSheet.classList.remove('hidden');
+            } else if (tab === 'clients') {
+                clientsTab.classList.add('active');
+                clientsSheet.classList.remove('hidden');
+            }
+        }
+
+        function updateMonthDisplay() {
+            const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            currentMonthElement.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+        }
+
+        function renderProjects() {
+            projectsTableBody.innerHTML = '';
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            const filteredProjects = projects.filter(project => {
+                const client = clients.find(c => c.id === project.clientId);
+                return project.name.toLowerCase().includes(searchTerm) || 
+                       (client && client.name.toLowerCase().includes(searchTerm));
+            });
+
+            filteredProjects.forEach((project, index) => {
+                const client = clients.find(c => c.id === project.clientId);
+                const row = document.createElement('tr');
+                row.className = 'excel-row';
+                
+                row.innerHTML = `
+                    <td class="excel-row-header">${index + 1}</td>
+                    <td class="excel-cell">${project.name}</td>
+                    <td class="excel-cell">${client ? client.name : 'Cliente não encontrado'}</td>
+                    <td class="excel-cell">${formatDate(project.startDate)}</td>
+                    <td class="excel-cell">${formatDate(project.endDate)}</td>
+                    <td class="excel-cell">R$ ${project.value.toFixed(2)}</td>
+                    <td class="excel-cell">
+                        <span class="px-2 py-1 rounded-full text-xs status-${project.status}">
+                            ${getStatusText(project.status)}
+                        </span>
+                    </td>
+                    <td class="excel-cell">
+                        <span class="${project.paymentStatus === 'recebido' ? 'payment-received' : 'payment-pending'}">
+                            ${project.paymentStatus === 'recebido' ? 'Recebido' : 'Pendente'}
+                            ${project.paymentDate ? `(${formatDate(project.paymentDate)})` : ''}
+                        </span>
+                    </td>
+                    <td class="excel-cell">
+                        <div class="flex space-x-2">
+                            <button class="text-blue-600 hover:text-blue-800" onclick="editProject(${project.id})">Editar</button>
+                            <button class="text-red-600 hover:text-red-800" onclick="deleteProject(${project.id})">Excluir</button>
+                        </div>
+                    </td>
+                `;
+                
+                projectsTableBody.appendChild(row);
+            });
+        }
+
+        function renderFinancial() {
+            financialTableBody.innerHTML = '';
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            const filteredProjects = projects.filter(project => {
+                const client = clients.find(c => c.id === project.clientId);
+                return project.name.toLowerCase().includes(searchTerm) || 
+                       (client && client.name.toLowerCase().includes(searchTerm));
+            });
+
+            filteredProjects.forEach((project, index) => {
+                const client = clients.find(c => c.id === project.clientId);
+                const liquidValue = project.value - (project.repasseValue || 0);
+                
+                const row = document.createElement('tr');
+                row.className = 'excel-row';
+                
+                row.innerHTML = `
+                    <td class="excel-row-header">${index + 1}</td>
+                    <td class="excel-cell">${project.name}</td>
+                    <td class="excel-cell">${client ? client.name : 'Cliente não encontrado'}</td>
+                    <td class="excel-cell">R$ ${project.value.toFixed(2)}</td>
+                    <td class="excel-cell">${project.repasseTo || '-'}</td>
+                    <td class="excel-cell">R$ ${(project.repasseValue || 0).toFixed(2)}</td>
+                    <td class="excel-cell">R$ ${liquidValue.toFixed(2)}</td>
+                    <td class="excel-cell">
+                        <span class="px-2 py-1 rounded-full text-xs repasse-status-${project.repasseStatus}">
+                            ${getRepasseStatusText(project.repasseStatus)}
+                        </span>
+                    </td>
+                    <td class="excel-cell">${project.repasseDate ? formatDate(project.repasseDate) : '-'}</td>
+                    <td class="excel-cell">
+                        <button class="text-blue-600 hover:text-blue-800" onclick="editFinancial(${project.id})">Editar</button>
+                    </td>
+                `;
+                
+                financialTableBody.appendChild(row);
+            });
+        }
+
+        function renderClients() {
+            clientsTableBody.innerHTML = '';
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            const filteredClients = clients.filter(client => 
+                client.name.toLowerCase().includes(searchTerm) || 
+                client.email.toLowerCase().includes(searchTerm) ||
+                (client.contact && client.contact.toLowerCase().includes(searchTerm))
+            );
+
+            filteredClients.forEach((client, index) => {
+                const clientProjects = projects.filter(p => p.clientId === client.id);
+                const totalRevenue = clientProjects.reduce((sum, p) => sum + p.value, 0);
+                
+                const row = document.createElement('tr');
+                row.className = 'excel-row';
+                
+                row.innerHTML = `
+                    <td class="excel-row-header">${index + 1}</td>
+                    <td class="excel-cell">${client.name}</td>
+                    <td class="excel-cell">${client.contact || '-'}</td>
+                    <td class="excel-cell">${client.email}</td>
+                    <td class="excel-cell">${client.phone || '-'}</td>
+                    <td class="excel-cell">${clientProjects.length}</td>
+                    <td class="excel-cell">R$ ${totalRevenue.toFixed(2)}</td>
+                    <td class="excel-cell">
+                        <div class="flex space-x-2">
+                            <button class="text-blue-600 hover:text-blue-800" onclick="editClient(${client.id})">Editar</button>
+                            <button class="text-red-600 hover:text-red-800" onclick="deleteClient(${client.id})">Excluir</button>
+                        </div>
+                    </td>
+                `;
+                
+                clientsTableBody.appendChild(row);
+            });
+        }
+
+        function renderCalendar() {
+            // Limpar dias existentes
+            calendar.innerHTML = '';
+
+            // Obter o primeiro dia do mês e o número de dias
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            
+            // Adicionar dias vazios para o início do mês
+            let startingDay = firstDay.getDay();
+            for (let i = 0; i < startingDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day bg-gray-50';
+                calendar.appendChild(emptyDay);
+            }
+
+            // Adicionar dias do mês
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                
+                // Verificar se há eventos neste dia
+                const currentDate = new Date(currentYear, currentMonth, day);
+                const formattedDate = formatDateForComparison(currentDate);
+                
+                // Cabeçalho do dia
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'calendar-day-header';
+                dayHeader.textContent = day;
+                dayElement.appendChild(dayHeader);
+                
+                // Verificar entregas
+                const deliveries = projects.filter(p => formatDateForComparison(new Date(p.endDate)) === formattedDate);
+                deliveries.forEach(project => {
+                    const deliveryItem = document.createElement('div');
+                    deliveryItem.className = `calendar-event bg-blue-100 text-blue-800`;
+                    deliveryItem.textContent = `📦 ${truncateText(project.name, 15)}`;
+                    deliveryItem.title = `Entrega: ${project.name}`;
+                    dayElement.appendChild(deliveryItem);
+                });
+                
+                // Verificar pagamentos
+                const payments = projects.filter(p => p.paymentDate && formatDateForComparison(new Date(p.paymentDate)) === formattedDate);
+                payments.forEach(project => {
+                    const paymentItem = document.createElement('div');
+                    paymentItem.className = `calendar-event ${project.paymentStatus === 'recebido' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`;
+                    paymentItem.textContent = `💰 ${truncateText(project.name, 15)}`;
+                    paymentItem.title = `Pagamento: ${project.name} - R$ ${project.value.toFixed(2)}`;
+                    dayElement.appendChild(paymentItem);
+                });
+                
+                // Verificar repasses
+                const repasses = projects.filter(p => p.repasseDate && formatDateForComparison(new Date(p.repasseDate)) === formattedDate);
+                repasses.forEach(project => {
+                    const repasseItem = document.createElement('div');
+                    repasseItem.className = `calendar-event ${project.repasseStatus === 'pago' ? 'bg-purple-100 text-purple-800' : 'bg-pink-100 text-pink-800'}`;
+                    repasseItem.textContent = `💸 ${truncateText(project.name, 15)}`;
+                    repasseItem.title = `Repasse: ${project.name} - R$ ${(project.repasseValue || 0).toFixed(2)}`;
+                    dayElement.appendChild(repasseItem);
+                });
+                
+                calendar.appendChild(dayElement);
+            }
+        }
+
+        function updateClientSelect() {
+            clientSelect.innerHTML = '';
+            clients.forEach(client => {
+                const option = document.createElement('option');
+                option.value = client.id;
+                option.textContent = client.name;
+                clientSelect.appendChild(option);
+            });
+        }
+
+        function updateDashboardStats() {
+            // Projetos ativos
+            const activeProjects = projects.filter(p => 
+                p.status === 'pendente' || p.status === 'em-andamento'
+            ).length;
+            activeProjectsElement.textContent = activeProjects;
+
+            // Receita do mês
+            const startOfMonth = new Date(currentYear, currentMonth, 1);
+            const endOfMonth = new Date(currentYear, currentMonth + 1, 0);
+            
+            const monthlyRevenue = projects
+                .filter(p => 
+                    p.paymentStatus === 'recebido' && 
+                    p.paymentDate && 
+                    new Date(p.paymentDate) >= startOfMonth && 
+                    new Date(p.paymentDate) <= endOfMonth
+                )
+                .reduce((sum, project) => sum + project.value, 0);
+            
+            monthlyRevenueElement.textContent = monthlyRevenue.toFixed(2);
+
+            // Receita pendente
+            const pendingRevenue = projects
+                .filter(p => p.paymentStatus === 'pendente')
+                .reduce((sum, project) => sum + project.value, 0);
+            
+            pendingRevenueElement.textContent = pendingRevenue.toFixed(2);
+        }
+
+        function saveProject() {
+            const projectId = document.getElementById('projectId').value;
+            const name = document.getElementById('projectName').value;
+            const clientId = parseInt(document.getElementById('clientSelect').value);
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const value = parseFloat(document.getElementById('projectValue').value);
+            const status = document.getElementById('projectStatus').value;
+            const paymentStatus = document.getElementById('paymentStatus').value;
+            const paymentDate = document.getElementById('paymentDate').value || null;
+
+            if (projectId) {
+                // Editar projeto existente
+                const index = projects.findIndex(p => p.id === parseInt(projectId));
+                if (index !== -1) {
+                    projects[index] = {
+                        ...projects[index],
+                        name,
+                        clientId,
+                        startDate,
+                        endDate,
+                        value,
+                        status,
+                        paymentStatus,
+                        paymentDate
+                    };
+                }
+            } else {
+                // Novo projeto
+                const newId = projects.length > 0 ? Math.max(...projects.map(p => p.id)) + 1 : 1;
+                projects.push({
+                    id: newId,
+                    name,
+                    clientId,
+                    startDate,
+                    endDate,
+                    value,
+                    status,
+                    paymentStatus,
+                    paymentDate,
+                    repasseTo: '',
+                    repasseValue: 0,
+                    repasseStatus: 'nao-necessario',
+                    repasseDate: null
+                });
+            }
+
+            projectModal.classList.add('hidden');
+            renderProjects();
+            renderFinancial();
+            renderCalendar();
+            renderClients();
+            updateDashboardStats();
+        }
+
+        function saveClient() {
+            const clientId = document.getElementById('clientId').value;
+            const name = document.getElementById('clientName').value;
+            const contact = document.getElementById('clientContact').value;
+            const email = document.getElementById('clientEmail').value;
+            const phone = document.getElementById('clientPhone').value;
+
+            if (clientId) {
+                // Editar cliente existente
+                const index = clients.findIndex(c => c.id === parseInt(clientId));
+                if (index !== -1) {
+                    clients[index] = {
+                        ...clients[index],
+                        name,
+                        contact,
+                        email,
+                        phone
+                    };
+                }
+            } else {
+                // Novo cliente
+                const newId = clients.length > 0 ? Math.max(...clients.map(c => c.id)) + 1 : 1;
+                clients.push({
+                    id: newId,
+                    name,
+                    contact,
+                    email,
+                    phone
+                });
+            }
+
+            clientModal.classList.add('hidden');
+            updateClientSelect();
+            renderClients();
+            renderProjects();
+            renderFinancial();
+        }
+
+        function saveFinancial() {
+            const projectId = parseInt(document.getElementById('financialProjectId').value);
+            const repasseTo = document.getElementById('repasseTo').value;
+            const repasseValue = parseFloat(document.getElementById('repasseValue').value) || 0;
+            const repasseStatus = document.getElementById('repasseStatus').value;
+            const repasseDate = document.getElementById('repasseDate').value || null;
+
+            const index = projects.findIndex(p => p.id === projectId);
+            if (index !== -1) {
+                projects[index] = {
+                    ...projects[index],
+                    repasseTo,
+                    repasseValue,
+                    repasseStatus,
+                    repasseDate
+                };
+            }
+
+            financialModal.classList.add('hidden');
+            renderFinancial();
+            renderCalendar();
+            updateDashboardStats();
+        }
+
+        function editProject(id) {
+            const project = projects.find(p => p.id === id);
+            if (project) {
+                document.getElementById('modalTitle').textContent = 'Editar Projeto';
+                document.getElementById('projectId').value = project.id;
+                document.getElementById('projectName').value = project.name;
+                document.getElementById('clientSelect').value = project.clientId;
+                document.getElementById('startDate').value = project.startDate;
+                document.getElementById('endDate').value = project.endDate;
+                document.getElementById('projectValue').value = project.value;
+                document.getElementById('projectStatus').value = project.status;
+                document.getElementById('paymentStatus').value = project.paymentStatus;
+                document.getElementById('paymentDate').value = project.paymentDate || '';
+                
+                projectModal.classList.remove('hidden');
+                editingProjectId = project.id;
+            }
+        }
+
+        function editClient(id) {
+            const client = clients.find(c => c.id === id);
+            if (client) {
+                document.getElementById('clientModalTitle').textContent = 'Editar Cliente';
+                document.getElementById('clientId').value = client.id;
+                document.getElementById('clientName').value = client.name;
+                document.getElementById('clientContact').value = client.contact || '';
+                document.getElementById('clientEmail').value = client.email;
+                document.getElementById('clientPhone').value = client.phone || '';
+                
+                clientModal.classList.remove('hidden');
+                editingClientId = client.id;
+            }
+        }
+
+        function editFinancial(id) {
+            const project = projects.find(p => p.id === id);
+            if (project) {
+                document.getElementById('financialModalTitle').textContent = 'Editar Informações Financeiras';
+                document.getElementById('financialProjectId').value = project.id;
+                document.getElementById('financialProjectName').textContent = project.name;
+                document.getElementById('financialProjectValue').textContent = `R$ ${project.value.toFixed(2)}`;
+                document.getElementById('repasseTo').value = project.repasseTo || '';
+                document.getElementById('repasseValue').value = project.repasseValue || '';
+                document.getElementById('repasseStatus').value = project.repasseStatus || 'nao-necessario';
+                document.getElementById('repasseDate').value = project.repasseDate || '';
+                
+                financialModal.classList.remove('hidden');
+            }
+        }
+
+        function deleteProject(id) {
+            if (confirm('Tem certeza que deseja excluir este projeto?')) {
+                const index = projects.findIndex(p => p.id === id);
+                if (index !== -1) {
+                    projects.splice(index, 1);
+                    renderProjects();
+                    renderFinancial();
+                    renderCalendar();
+                    renderClients();
+                    updateDashboardStats();
+                }
+            }
+        }
+
+        function deleteClient(id) {
+            // Verificar se há projetos associados a este cliente
+            const clientProjects = projects.filter(p => p.clientId === id);
+            
+            if (clientProjects.length > 0) {
+                alert(`Não é possível excluir este cliente pois existem ${clientProjects.length} projetos associados a ele.`);
+                return;
+            }
+            
+            if (confirm('Tem certeza que deseja excluir este cliente?')) {
+                const index = clients.findIndex(c => c.id === id);
+                if (index !== -1) {
+                    clients.splice(index, 1);
+                    renderClients();
+                    updateClientSelect();
+                }
+            }
+        }
+
+        // Funções auxiliares
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('pt-BR');
+        }
+
+        function formatDateForComparison(date) {
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'pendente': 'Pendente',
+                'em-andamento': 'Em Andamento',
+                'concluido': 'Concluído',
+                'atrasado': 'Atrasado'
+            };
+            return statusMap[status] || status;
+        }
+
+        function getRepasseStatusText(status) {
+            const statusMap = {
+                'pendente': 'Pendente',
+                'pago': 'Pago',
+                'nao-necessario': 'Não Necessário'
+            };
+            return statusMap[status] || status;
+        }
+
+        function truncateText(text, maxLength) {
+            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+        }
+
+        // Funções globais para acesso via HTML
+        window.editProject = editProject;
+        window.deleteProject = deleteProject;
+        window.editClient = editClient;
+        window.deleteClient = deleteClient;
+        window.editFinancial = editFinancial;
+    </script>
+</body>
+</html>
